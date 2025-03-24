@@ -1,0 +1,23 @@
+{
+  "name": "com_link_manager",
+  "version": "1.0.0",
+  "description": " A class that helps orchestrate an application's communication links.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/copious-world/com_link_manager.git"
+  },
+  "keywords": [
+    "communication",
+    "orchestration"
+  ],
+  "author": "R. Leddy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/copious-world/com_link_manager/issues"
+  },
+  "homepage": "https://github.com/copious-world/com_link_manager#readme"
+}
