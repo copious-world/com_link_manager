@@ -5,9 +5,9 @@ const fs = require('fs')
 const {MessageRelayer} = require('message-relay-services')
 
 
-conf_file = process.argv[2]
+let configuration_file = process.argv[2]
 
-if ( conf_file === undefined ) {
+if ( configuration_file === undefined ) {
     console.log("the db tool needs a configuration file for sending connection commands to the transition app")
     process.exit(0)
 }
@@ -19,7 +19,7 @@ if ( connection_type === undefined ) {
 }
 
 //
-let conf_str = fs.readFileSync(conf_file).toString()
+let conf_str = fs.readFileSync(configuration_file).toString()
 let conf = JSON.parse(conf_str)
 
 
@@ -35,7 +35,7 @@ message_relayer.on('client-ready',async () => {
 
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-    if ( descriptor.action = 'add-service' ) {
+    if ( descriptor.action === 'add-service' ) {
         msg_obj._tx_op = "AS"
         msg_obj._id = "add-connections"
     } else { // -- remove servivce
@@ -46,8 +46,8 @@ message_relayer.on('client-ready',async () => {
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
     let cmd_pars = descriptor.parameters
-    msg_obj.paramters = Object.assign({},cmd_pars);
-    cmd_pars = msg_obj.paramters
+    msg_obj.parameters = Object.assign({},cmd_pars);
+    cmd_pars = msg_obj.parameters
 
     if ( typeof cmd_pars.conf !== 'object' ) {
         console.log("no configuration object specified for " + connection_type)
@@ -55,7 +55,7 @@ message_relayer.on('client-ready',async () => {
     }
 
     if ( descriptor.action = "db-management" ) {
-        if ( cmd_pars.target === "database" ) {
+        if ( descriptor.target === "database" ) {
             //
             let possible_db_types = {
                 "key_value_db" : false,
@@ -96,8 +96,10 @@ message_relayer.on('client-ready',async () => {
             }
         }
     } else if ( descriptor.action = 'add-service' ) {
-        //
-        if ( cmd_pars.target === 'transtion_engine' ) {
+        // ----
+        if ( descriptor.target === "module" ) {
+                //
+        } else if ( descriptor.target === 'transtion_engine' ) {
             //
             if ( typeof cmd_pars.module !== 'string' ) {
                 console.log("no configuration object specified for " + connection_type)
@@ -115,7 +117,7 @@ message_relayer.on('client-ready',async () => {
             }
             // // // // 
             //
-        } else if ( cmd_pars.target === "database" ) {
+        } else if ( descriptor.target === "database" ) {
             let possible_db_types = {
                 "key_value_db" : true,
                 "session_key_value_db" : true,
@@ -142,7 +144,7 @@ message_relayer.on('client-ready',async () => {
                 "create" : "boolean"
             }
             //
-        } else if ( cmd_pars.target === "websocket" ) {
+        } else if ( descriptor.target === "websocket" ) {
             let possible_op_types = {
                 "add_web_socket_server" : true,
                 "new_http" : true,
@@ -183,7 +185,7 @@ message_relayer.on('client-ready',async () => {
 
     } else { // -- remove servivce
         //
-        if ( cmd_pars.target === "database" ) {
+        if ( descriptor.target === "database" ) {
             let possible_db_types = {
                 "key_value_db" : true,
                 "session_key_value_db" : true,
