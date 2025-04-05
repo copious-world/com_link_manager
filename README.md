@@ -3,10 +3,17 @@
  A class that helps orchestrate an application's communication links.
 
 
+## Install
+
+```
+npm install -g com_link_manager
+```
 
 ## Current State
 
-Putting this out today for use in setting up mail, contact, blog, streamers, etc.
+Putting this out today for use in setting up mail, contact, blog, streamers, etc. 
+
+Beginning to document various basic uses. Some code changes for simplifying the readability of a config file.
 
 
 ## Basic Use
@@ -120,13 +127,13 @@ In the following, the tool expects that a service will have launched an endpoint
                                     }
                                 }
                             }
-                    },			
+                    	},			
 
-                        "counters" : {
+                       	"counters" : {
                             "main" : {}
-                        }
+ 							}
 
-                        "relayer" : {
+                       "relayer" : {
                             "files_only" : false,
                             "output_dir" : "fail_over_persistence",
                             "output_file" : "/user_data.json",
