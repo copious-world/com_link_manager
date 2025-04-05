@@ -5,9 +5,65 @@
 
 ## Install
 
+### comand line
 ```
 npm install -g com_link_manager
 ```
+
+
+### endpoint server 
+
+To be a serving endpoint for link management, install this module to your projects:
+
+```
+npm install -s com_link_manager
+```
+
+Then import the class into your application
+
+```
+const LinkManager = require("com_link_manager")
+```
+
+Then implement the methods required of the LinkManager to manage communications connections. The following is an example of the use of this class to set up path usage in `lmtp_mail_bridge`:
+
+```
+construct() {
+
+	...
+
+	this.link_manager = new LinkManager(endpoint_conf)
+	
+	this.link_manager.add_instance_paths("mail",this)   // tell the link manager to look for this LMTP server for path use
+	this.link_manager.add_instance_paths("persistence",this)   // tell the link manager to look for this LMTP server for path use
+	
+	this.messenger = false      // for mail body and headers
+	this.persistence = false;  // for attachments
+	
+	...
+	
+}
+
+...
+
+async set_messenger(path,instance,conf) {
+    if ( (path !== 'mail') && (path !== 'persistence') ) {
+        return
+    }
+    if ( path === 'mail' ) {
+        this.messenger = instance
+    }
+    if ( path === 'pesistence' ) {
+        this.persistence = instance
+    }
+}
+
+
+```
+
+
+
+
 
 ## Current State
 
