@@ -2,16 +2,30 @@
 
  A class that helps orchestrate an application's communication links.
 
+## Purpose
+
+It seemed to be a good idea to do this as the number of configurations for individual micro-services started to grow. It does not have to become a large number before one realizes that consoldating configuration for links becomes helpful. Key management feeds directly into this awareness. 
+
+Setting up a managed configuration directory helps, but the configuration files have to be delivered to all the run directories. As it is, some part of those have to be delivered still. But, on top of the file management, there is also the ordering of startup. What if a service fails and has to come back up? Do we restart all the services? 
+
+The issue of all this being secure comes to mind. But, the command line tool provided here should only be used within the garden walls. (The command line tool will be refered to as the "the tool" in the following.)
 
 ## Install
 
-### comand line
+### command line
+
 ```
 npm install -g com_link_manager
 ```
 
+The command line is for the execution of the tool, **`com_link_manager`**. The tool uses two parameters:
 
-### endpoint server 
+1. The name of a configuration file in JSON format.
+2. the name of the target found in the configuration file object under the field ***connections***.
+
+Each object keydd by the ***connections*** map specifies actions that a server may take to manage connections if the server has been programmed to use the ***LinkManager*** class.
+
+### endpoint server
 
 To be a serving endpoint for link management, install this module to your projects:
 
@@ -97,7 +111,9 @@ Each configuration type starts with the configuration for a message relayer. The
 ### mail
 
 
-In the following, the tool expects that a service will have launched an endpoint service for link management. The endpoint is an extension of the LinkManager class that comes with this module. The security options are off. On the command line, the second script parameter is "attachments". This mail service will set up a global persistence link.
+In the following, the tool expects that a service will have launched an endpoint service for link management. The endpoint is an extension of the LinkManager class that comes with this module. The security options are off. 
+
+On the command line, the second script parameter is "***attachments***". This mail service will set up a global persistence link. With a different command line parameter, "***mail***", the mail server can set up a connection to a "***mail***" endpoint server. 
 
 
 ```
@@ -183,11 +199,11 @@ In the following, the tool expects that a service will have launched an endpoint
                                     }
                                 }
                             }
-                    	},			
+                    	},
 
-                       	"counters" : {
-                            "main" : {}
- 							}
+							"counters" : {
+								"main" : {}
+							},
 
                        "relayer" : {
                             "files_only" : false,
@@ -259,3 +275,228 @@ In the following, the tool expects that a service will have launched an endpoint
     }
 }
 ```
+
+
+
+### copious transtion apps
+
+
+In the following collection of configurations, the tool expects that a services will have launched an endpoint service for link management. The endpoint is an extension of the LinkManager class that comes with this module. In the examplse, the security options are off.
+
+Each module has a particular set of connections they set up with relationships to databases, persistence services, session management participation, and more. Other things may include particular connections to API services of downstream transaction processing.
+
+With the LinkManager in use, the copious-transition-apps startup with a default (and very basic) database. Once they are up, the tool may be used to connect them to better services.
+
+***copious-transitions*** extends the LinkManager class that help transition engines and database interfaces to make connections. The configuration files may contain field specific to the copious-transitions-apps.
+
+#### 1. captcha-igid : main web server framework
+
+```
+{
+    "link_manager" : {
+        "address" : "192.168.1.81",
+        "port"	: 5551,
+        "use_tls" : false,
+        "tls" : {
+            "preloaded" : {
+                "client_key" : false,
+                "server_cert" : false
+            },
+            "client_key" : false,
+            "server_cert" : false
+        },
+        "default_tls" : false,
+        "extended_tls_options" : false,
+        "send_on_reconnect" : false,
+        "attempt_reconnect" : false,
+        "max_reconnect" : 0,
+        "reconnect_wait" 0
+    },
+
+	"connections" : {
+		"session_db" : {
+			"action" : "add-service",
+ 			"target" : "module",
+			"parameters" : {
+				"target" : "database",
+				"module" : "shared-table-types",
+				"class_definition" : "ChildProcDBComInterface",
+				"db_type" : "session_key_value_db",
+				"create" : true,
+				"share" : false,
+				"conf" : {
+					"in_mem_table_connect" : {
+						"uds_path" : "./session_pipe-1",
+						"uds_path_count" : 0    
+					}
+				}
+			}
+    	},
+    	"key_value_db" : {},
+    	"persistence_db" : {
+			"action" : "add-service",
+ 			"target" : "module",
+			"parameters" : {
+				"target" : "database",
+				"module" : "message-relay-service",
+				"class_definition" : "MessageRelayer",
+				"db_type" : "session_key_value_db",
+				"create" : true,
+				"share" : false,
+				"conf" : {
+			        "address" : "192.168.1.81",
+			        "port"	: 5571,
+			        "use_tls" : false,
+			        "tls" : {
+			            "preloaded" : {
+			                "client_key" : false,
+			                "server_cert" : false
+			            },
+			            "client_key" : false,
+			            "server_cert" : false
+			        },
+			        "default_tls" : false,
+			        "extended_tls_options" : false,
+			        "send_on_reconnect" : false,
+			        "attempt_reconnect" : false,
+			        "max_reconnect" : 0,
+			        "reconnect_wait" 0
+				}
+			}
+    	}
+    }
+}
+
+```
+
+
+#### 2. media-up-igid : session aware upload service (larger files)
+
+```
+{
+    "link_manager" : {
+        "address" : "192.168.1.81",
+        "port"	: 5552,
+        "use_tls" : false,
+        "tls" : {
+            "preloaded" : {
+                "client_key" : false,
+                "server_cert" : false
+            },
+            "client_key" : false,
+            "server_cert" : false
+        },
+        "default_tls" : false,
+        "extended_tls_options" : false,
+        "send_on_reconnect" : false,
+        "attempt_reconnect" : false,
+        "max_reconnect" : 0,
+        "reconnect_wait" 0
+    },
+
+    "connections" : {
+    	"session_db" : {},
+    	"persistence_db" : {},
+    	"static_db" : {},
+    	"key_value_db" : {},
+    	"global_persistence" : {},
+    	"local_files" : {}
+    }
+}
+```
+
+
+#### 3. media-up-lite-igid : session aware upload service (small files)
+
+```
+{
+    "link_manager" : {
+        "address" : "192.168.1.81",
+        "port"	: 5553,
+        "use_tls" : false,
+        "tls" : {
+            "preloaded" : {
+                "client_key" : false,
+                "server_cert" : false
+            },
+            "client_key" : false,
+            "server_cert" : false
+        },
+        "default_tls" : false,
+        "extended_tls_options" : false,
+        "send_on_reconnect" : false,
+        "attempt_reconnect" : false,
+        "max_reconnect" : 0,
+        "reconnect_wait" 0
+    },
+
+    "connections" : {
+    	"session_db" : {},
+    	"persistence_db" : {},
+    	"static_db" : {},
+    	"key_value_db" : {},
+    	"local_files" : {},
+    	"web_sockets" : {}
+    }
+}
+```
+
+
+#### 4. publication-igid : session aware media publication management
+
+```
+{
+    "link_manager" : {
+        "address" : "192.168.1.81",
+        "port"	: 5554,
+        "use_tls" : false,
+        "tls" : {
+            "preloaded" : {
+                "client_key" : false,
+                "server_cert" : false
+            },
+            "client_key" : false,
+            "server_cert" : false
+        },
+        "default_tls" : false,
+        "extended_tls_options" : false,
+        "send_on_reconnect" : false,
+        "attempt_reconnect" : false,
+        "max_reconnect" : 0,
+        "reconnect_wait" 0
+    },
+
+    "connections" : {
+    	"session_db" : {},
+    	"key_value_db" : {},
+    	"local_files" : {},
+    	"web_sockets" : {}
+    }
+}
+```
+
+
+
+#### 5. song-search : crypto interface
+
+TBD
+
+#### 6. counter-access-igid : follows
+
+> ***access to contract managment and media usage tracking***
+
+
+
+### Endpoint Services
+
+Endpoint services get introduced to counting services and searchers by offering subscription to their publication topics. 
+
+Link management for the counters and searchers controlls their subscription behavior relative to the endpoints.
+
+### Counting Services
+
+Counting services get introductions to streamers.
+
+
+
+
