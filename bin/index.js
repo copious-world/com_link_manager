@@ -26,7 +26,7 @@ let conf = JSON.parse(conf_str)
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-let message_relayer = new MessageRelayer(conf)
+let message_relayer = new MessageRelayer(conf.link_manager)
 message_relayer.on('client-ready',async () => {
     //
     //

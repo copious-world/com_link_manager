@@ -39,105 +39,160 @@ In the following, the tool expects that a service will have launched an endpoint
 
 ```
 {
-	"address" : "192.168.1.77",
-	"port"	: 5567,
-	"use_tls" : false,
-	"tls" : {
-		"preloaded" : {
-			"client_key" : false,
-			"server_cert" : false
-		},
-		"client_key" : false,
-		"server_cert" : false
-	},
-	"default_tls" : false,
-	"extended_tls_options" : false,
-	"send_on_reconnect" : false,
-	"attempt_reconnect" : false,
-	"max_reconnect" : 0,
-	"reconnect_wait" 0,
-	
-	"attachments" : {
-		"action" : "add-service",
-		"target" : "module",
-		"parameters" : {
-			"path" : "persistence",
-			"module" : "global_persistence",
-			"class_definition" : "CategoricalPersistenceManager",
-			"create" : true,
-			"share" : false,
-			"conf" : {
-				"cache_manager" : false,
-				"media_handler" : false,
-				"repo_bridge" : {
-					"relayer" : {
-						"paths" : [
-							{
-								"path" : "mail",
-								"address" : "192.168.1.81",
-								"port"	: 5567,
-								"use_tls" : false,
-								"tls" : {
-									"preloaded" : {
-										"client_key" : false,
-										"server_cert" : false
-									},
-									"client_key" : false,
-									"server_cert" : false
-								},
-								"default_tls" : false,
-								"extended_tls_options" : false,
-								"send_on_reconnect" : false,
-								"attempt_reconnect" : false,
-								"max_reconnect" : 0,
-								"reconnect_wait" 0
-							}
-						],
-						"media_dir" : "a place",
-						"entries_dir" : "a place",
-						"default_repo" : "LAN",
-						"media_types" : ["all"],
-						"media_encryption_selection" : {
-							"image" : true,
-							"text" : false
-						}
-					}
-				}
-			}
-		}
-	},
-	
-	
-	"mail" : {
-		"action" : "add-service",
-		"target" : "module",
-		"parameters" : {
-			"path" : "mail",
-			"module" : "message-relay-services",
-			"class_definition" : "MessageRelayer",
-			"create" : true
-			"conf" : {
-				"address" : "192.168.1.81",
-				"port"	: 5569,
-				"use_tls" : false,
-				"tls" : {
-					"preloaded" : {
-						"client_key" : false,
-						"server_cert" : false
-					},
-					"client_key" : false,
-					"server_cert" : false
-				},
-				"default_tls" : false,
-				"extended_tls_options" : false,
-				"send_on_reconnect" : false,
-				"attempt_reconnect" : false,
-				"max_reconnect" : 0,
-				"reconnect_wait" 0
-			}
-		}
-	}
-	
-}
+    "link_manager" : {
+        "address" : "192.168.1.77",
+        "port"	: 5567,
+        "use_tls" : false,
+        "tls" : {
+            "preloaded" : {
+                "client_key" : false,
+                "server_cert" : false
+            },
+            "client_key" : false,
+            "server_cert" : false
+        },
+        "default_tls" : false,
+        "extended_tls_options" : false,
+        "send_on_reconnect" : false,
+        "attempt_reconnect" : false,
+        "max_reconnect" : 0,
+        "reconnect_wait" 0
+    },
 
+    "connections" : {
+        "attachments" : {
+            "action" : "add-service",
+            "target" : "module",
+            "parameters" : {
+                "path" : "persistence",
+                "module" : "global_persistence",
+                "class_definition" : "CategoricalPersistenceManager",
+                "create" : true,
+                "share" : false,
+                "conf" : {
+                    "cache_manager" : false,
+                    //
+                    "repo_bridge" : {
+                        "_wrapper_key": "{\"key_ops\":[\"wrapKey\"],\"ext\":true,\"kty\":\"RSA\",\"n\":\"uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\",\"e\":\"AQAB\",\"alg\":\"RSA-OAEP-256\"}",
+                        "_wrapper_keys" : {
+                            "persistence" : "{\"key_ops\":[\"wrapKey\"],\"ext\":true,\"kty\":\"RSA\",\"n\":\"uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\",\"e\":\"AQAB\",\"alg\":\"RSA-OAEP-256\"}",
+                            "paid-persistence" : "{\"key_ops\":[\"wrapKey\"],\"ext\":true,\"kty\":\"RSA\",\"n\":\"uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\",\"e\":\"AQAB\",\"alg\":\"RSA-OAEP-256\"}"
+                        },
+
+                        "media_handler" : false, 
+        
+                        "media_handler_conf" : {
+                            "media_dir": "./test-output/pub_media/$media_type/",
+                            "entries_dir": "./test-output/data/$asset_type/",
+                            "media_types" : {
+                                "audio" : { "encrypted" : true, "store_local" : true, "store_repo" : true },
+                                "video" : { "encrypted" : false, "store_local" : true, "store_repo" : true },
+                                "image" : { "encrypted" : true, "store_local" : true, "store_repo" : true },
+                                "text" : { "encrypted" : true, "store_local" : true, "store_repo" : false }
+                            },
+                            "media_encryption_selection" : {
+                                "audio" : false,
+                                "image" : false,
+                                "text" : false
+                            },
+                            "default_p2p_repo" : "LAN",
+                            "accepted_repos" : false,
+                            "repos" : {
+                                "ipfs": {
+                                    "dir" : "uploader-ipfs-repo",
+                                    "swarm_tcp" : 4024,
+                                    "swarm_ws" : 4025,
+                                    "api_port" : 5024,
+                                    "tcp_gateway" : 9292
+                                },
+                                "LAN" : {
+                                    "base_dir" : "./test/dat_LAN_local",
+                                    "local_only" : true,
+                                    "node_relay" : {
+                                        "address" : "localhost",
+                                        "port" : 1234
+                                    },
+                                    "local_only" : false,
+                                    "ssh" : {
+                                        "address" : "192.168.1.33",
+                                    "user" : "biff",
+                                    "pass" : "trustm"
+                                    }
+                                }
+                            }
+                    },			
+
+                        "counters" : {
+                            "main" : {}
+                        }
+
+                        "relayer" : {
+                            "files_only" : false,
+                            "output_dir" : "fail_over_persistence",
+                            "output_file" : "/user_data.json",
+                            "max_pending_messages" : false,
+                            "file_shunting" : false,
+                            "max_reconnect" : 24,
+                            "reconnect_wait" : 5,
+                            "attempt_reconnect" : true,
+                            "paths" : [
+                                {
+                                    "path" : "user",
+                                    "port" : 5114,
+                                    "address" : "localhost",
+                                    "tls" : {
+                                        "client_key" : "keys/cl_ec_key.pem",
+                                        "client_cert" : "keys/cl_ec_crt.crt",
+                                        "server_cert" : "keys/ec_crt.crt"
+                                    }
+                                },
+                                {
+                                    "path" : "persistence",
+                                    "port" : 5116,
+                                    "address" : "localhost",
+                                    "tls" : {
+                                        "client_key" : "keys/cl_ec_key.pem",
+                                        "client_cert" : "keys/cl_ec_crt.crt",
+                                        "server_cert" : "keys/ec_crt.crt"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        
+        "mail" : {
+            "action" : "add-service",
+            "target" : "module",
+            "parameters" : {
+                "path" : "mail",
+                "module" : "message-relay-services",
+                "class_definition" : "MessageRelayer",
+                "create" : true
+                "share" : false,
+                "conf" : {
+                    "address" : "192.168.1.81",
+                    "port"	: 5569,
+                    "use_tls" : false,
+                    "tls" : {
+                        "preloaded" : {
+                            "client_key" : false,
+                            "server_cert" : false
+                        },
+                        "client_key" : false,
+                        "server_cert" : false
+                    },
+                    "default_tls" : false,
+                    "extended_tls_options" : false,
+                    "send_on_reconnect" : false,
+                    "attempt_reconnect" : false,
+                    "max_reconnect" : 0,
+                    "reconnect_wait" 0
+                }
+            }
+        }
+    }
+}
 ```
