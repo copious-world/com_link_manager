@@ -38,9 +38,15 @@ message_relayer.on('client-ready',async () => {
     if ( descriptor.action === 'add-service' ) {
         msg_obj._tx_op = "AS"
         msg_obj._id = "add-connections"
-    } else { // -- remove servivce
+    } else if ( descriptor.action === 'update-service' ) {
+        msg_obj._tx_op = "US"
+        msg_obj._id = "update-connections"
+    } else if ( descriptor.action === 'remove-service' ) { // -- remove service
         msg_obj._tx_op = "RS"
         msg_obj._id = "remove-connections"
+    } else if ( descriptor.action === 'run-command' ){
+        msg_obj._tx_op = "RN"
+        msg_obj._id = "execmd"
     }
 
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -49,7 +55,7 @@ message_relayer.on('client-ready',async () => {
     msg_obj.parameters = Object.assign({},cmd_pars);
     cmd_pars = msg_obj.parameters
 
-    if ( typeof cmd_pars.conf !== 'object' ) {
+    if ( (msg_obj._tx_op !== "RN") && (typeof cmd_pars.conf !== 'object') ) {
         console.log("no configuration object specified for " + connection_type)
         process.exit(0)
     }
