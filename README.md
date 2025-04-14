@@ -809,7 +809,7 @@ Counting services get introductions to streamers.
 			        "send_on_reconnect" : false,
 			        "attempt_reconnect" : false,
 			        "max_reconnect" : 0,
-			        "reconnect_wait" 0
+			        "reconnect_wait" : 0
 				}
 			}
     	},
