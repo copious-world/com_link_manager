@@ -1,10 +1,10 @@
 {
   "name": "com_link_manager",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": " A class that helps orchestrate an application's communication links.",
   "main": "index.js",
-  "bin" : {
-    "com_link_manager" : "./bin/index"
+  "bin": {
+    "com_link_manager": "./bin/index"
   },
   "scripts": {
     "test": "node ./tests/index.js"
@@ -20,11 +20,14 @@
   "author": "R. Leddy",
   "license": "MIT",
   "funding": {
-    "type" : "GitHub Sponsors",
-    "url" : "https://github.com/sponsors/copious-world"
+    "type": "GitHub Sponsors",
+    "url": "https://github.com/sponsors/copious-world"
   },
   "bugs": {
     "url": "https://github.com/copious-world/com_link_manager/issues"
   },
-  "homepage": "https://github.com/copious-world/com_link_manager#readme"
+  "homepage": "https://github.com/copious-world/com_link_manager#readme",
+  "dependencies": {
+    "message-relay-services": "^0.9.25"
+  }
 }
