@@ -1,11 +1,11 @@
 {
   "name": "com_link_manager",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": " A class that helps orchestrate an application's communication links.",
-  "main": "index.js",
   "bin": {
-    "com_link_manager": "./bin/index"
+    "com_link_manager" : "./bin/index.js"
   },
+  "main": "index.js",
   "scripts": {
     "test": "node ./tests/index.js"
   },
