@@ -207,7 +207,8 @@ message_relayer.on('client-ready',async () => {
     }
 
     // may have field instance
-
+    msg_obj._x_admin_capable = true
+    //
     let result = await message_relayer.send_on_path(msg_obj,"connections")
     console.dir(result)
     //
