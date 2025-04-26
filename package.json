@@ -1,6 +1,6 @@
 {
   "name": "com_link_manager",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": " A class that helps orchestrate an application's communication links.",
   "bin": {
     "com_link_manager" : "./bin/index.js"
