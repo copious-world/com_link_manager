@@ -1,6 +1,6 @@
 {
   "name": "com_link_manager",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": " A class that helps orchestrate an application's communication links.",
   "bin": {
     "com_link_manager" : "./bin/index.js"
@@ -28,6 +28,6 @@
   },
   "homepage": "https://github.com/copious-world/com_link_manager#readme",
   "dependencies": {
-    "message-relay-services": "^0.9.28"
+    "message-relay-services": "^0.9.29"
   }
 }
