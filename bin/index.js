@@ -5,14 +5,46 @@ const fs = require('fs')
 const {MessageRelayer} = require('message-relay-services')
 
 
-let configuration_file = process.argv[2]
+let address_override = false
+let port_override = false
+
+
+let configuration_file = false
+let connection_type = false
+
+let n = process.argv.length
+for ( let i = 2; i < n; i++ ) {
+    if ( process.argv[i].substring(0,1) === '-' ) {
+        if ( process.argv[i] == "-a" ) {
+            address_override = process.argv[i+1]
+            if ( address_override === undefined ) {
+                console.log("port flag given but no port...")
+                process.exit(0)
+            }
+        } else if ( process.argv[i] == "-p" ) {
+            port_override = process.argv[i+1]
+            if ( port_override === undefined ) {
+                console.log("port flag given but no port...")
+                process.exit(0)
+            }
+        }
+        i++
+    } else {
+        if ( configuration_file === false ) {
+            configuration_file = process.argv[i]
+        } else {
+            connection_type = process.argv[i]
+        }
+    }
+}
+
+
 
 if ( configuration_file === undefined ) {
     console.log("the db tool needs a configuration file for sending connection commands to the transition app")
     process.exit(0)
 }
 
-let connection_type = process.argv[3]
 if ( connection_type === undefined ) {
     console.log("the db tool needs a connection type for sending connection commands to the transition app")
     process.exit(0)
@@ -25,6 +57,14 @@ let conf = JSON.parse(conf_str)
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+if ( address_override !== false ) {
+    conf.link_manager.address = address_override
+}
+if ( port_override !== false ) {
+    conf.link_manager.port = port_override
+}
+
 
 let message_relayer = new MessageRelayer(conf.link_manager)
 message_relayer.on('client-ready',async () => {
