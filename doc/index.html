@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Overview</a></h2><h2><a href="https://github.com/copious-world/com_link_manager" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://www.npmjs.com/package/com_link_manager" target="_blank" class="menu-item" id="package" >Npm package</a></h2><h3>Classes</h3>
+                        <ul id="classes-ul-overflow" class="menu-contained-nav" ><li><a href="base.LinkManager.html">base.LinkManager</a><ul class='methods'><li data-type='method' style='display: none;'><a href="base.LinkManager.html#add_paths_for">add_paths_for</a></li><li data-type='method' style='display: none;'><a href="base.LinkManager.html#add_service_connections">add_service_connections</a></li><li data-type='method' style='display: none;'><a href="base.LinkManager.html#app_message_handler">app_message_handler</a></li><li data-type='method' style='display: none;'><a href="base.LinkManager.html#instantiate_com">instantiate_com</a></li></ul></li></ul>
+                    
+    
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme usertext">
+        <article><h1><code>com_link_manager</code></h1>
+<p>A class that helps orchestrate an application's communication links.</p>
+<h2>Purpose</h2>
+<p>It seemed to be a good idea to do this as the number of configurations for individual micro-services started to grow. It does not have to become a large number before one realizes that consoldating configuration for links becomes helpful. Key management feeds directly into this awareness.</p>
+<p>Setting up a managed configuration directory helps, but the configuration files have to be delivered to all the run directories. As it is, some part of those have to be delivered still. But, on top of the file management, there is also the ordering of startup. What if a service fails and has to come back up? Do we restart all the services?</p>
+<p>The issue of all this being secure comes to mind. But, the command line tool provided here should only be used within the garden walls. (The command line tool will be refered to as the &quot;the tool&quot; in the following.)</p>
+<h2>Install</h2>
+<h3>command line</h3>
+<pre class="prettyprint source"><code>npm install -g com_link_manager
+</code></pre>
+<p>The command line is for the execution of the tool, <strong><code>com_link_manager</code></strong>. The tool uses two parameters:</p>
+<ol>
+<li>The name of a configuration file in JSON format.</li>
+<li>the name of the target found in the configuration file object under the field <em><strong>connections</strong></em>.</li>
+</ol>
+<p>Each object keydd by the <em><strong>connections</strong></em> map specifies actions that a server may take to manage connections if the server has been programmed to use the <em><strong>LinkManager</strong></em> class.</p>
+<h3>endpoint server</h3>
+<p>To be a serving endpoint for link management, install this module to your projects:</p>
+<pre class="prettyprint source"><code>npm install -s com_link_manager
+</code></pre>
+<p>Then import the class into your application</p>
+<pre class="prettyprint source"><code>const LinkManager = require(&quot;com_link_manager&quot;)
+</code></pre>
+<p>Then implement the methods required of the LinkManager to manage communications connections. The following is an example of the use of this class to set up path usage in <code>lmtp_mail_bridge</code>:</p>
+<pre class="prettyprint source"><code>construct() {
+
+	...
+
+	this.link_manager = new LinkManager(endpoint_conf)
+	
+	this.link_manager.add_instance_paths(&quot;mail&quot;,this)   // tell the link manager to look for this LMTP server for path use
+	this.link_manager.add_instance_paths(&quot;persistence&quot;,this)   // tell the link manager to look for this LMTP server for path use
+	
+	this.messenger = false      // for mail body and headers
+	this.persistence = false;  // for attachments
+	
+	...
+	
+}
+
+...
+
+async set_messenger(path,instance,conf) {
+    if ( (path !== 'mail') && (path !== 'persistence') ) {
+        return
+    }
+    if ( path === 'mail' ) {
+        this.messenger = instance
+    }
+    if ( path === 'pesistence' ) {
+        this.persistence = instance
+    }
+}
+
+
+</code></pre>
+<h2>Current State</h2>
+<p>Putting this out today for use in setting up mail, contact, blog, streamers, etc.</p>
+<p>Beginning to document various basic uses. Some code changes for simplifying the readability of a config file.</p>
+<h2>Basic Use</h2>
+<p>The global shell command is <code>com_link_manager</code>. This command takes two command line paraters:</p>
+<ul>
+<li>the name of the configuration file</li>
+<li>the key to the type of connection being configured for the endpoint.</li>
+</ul>
+<p>The types of connections that MessageLink endpoints will start up are keyed into the configuration file <em>map</em>. The user enters these types on the command line after the name of the configuration file.</p>
+<p>Here is an example:</p>
+<pre class="prettyprint source"><code>com_link_manager my_mail.conf attachments
+</code></pre>
+<h2>Configuration</h2>
+<p>Each configuration type starts with the configuration for a message relayer. The configuration for a type then includes the parameters for the type. All will include a module description for the type of connector the target will create.</p>
+<h3>mail</h3>
+<p>In the following, the tool expects that a service will have launched an endpoint service for link management. The endpoint is an extension of the LinkManager class that comes with this module. The security options are off.</p>
+<p>On the command line, the second script parameter is &quot;<em><strong>attachments</strong></em>&quot;. This mail service will set up a global persistence link. With a different command line parameter, &quot;<em><strong>mail</strong></em>&quot;, the mail server can set up a connection to a &quot;<em><strong>mail</strong></em>&quot; endpoint server.</p>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.77&quot;,
+        &quot;port&quot;	: 5567,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+    &quot;connections&quot; : {
+        &quot;attachments&quot; : {
+            &quot;action&quot; : &quot;add-service&quot;,
+            &quot;target&quot; : &quot;module&quot;,
+            &quot;parameters&quot; : {
+                &quot;path&quot; : &quot;persistence&quot;,
+                &quot;module&quot; : &quot;global_persistence&quot;,
+                &quot;class_definition&quot; : &quot;CategoricalPersistenceManager&quot;,
+                &quot;create&quot; : true,
+                &quot;share&quot; : false,
+                &quot;conf&quot; : {
+                    &quot;cache_manager&quot; : false,
+                    //
+                    &quot;repo_bridge&quot; : {
+                        &quot;_wrapper_key&quot;: &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;,
+                        &quot;_wrapper_keys&quot; : {
+                            &quot;persistence&quot; : &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;,
+                            &quot;paid-persistence&quot; : &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;
+                        },
+
+                        &quot;media_handler&quot; : false, 
+        
+                        &quot;media_handler_conf&quot; : {
+                            &quot;media_dir&quot;: &quot;./test-output/pub_media/$media_type/&quot;,
+                            &quot;entries_dir&quot;: &quot;./test-output/data/$asset_type/&quot;,
+                            &quot;media_types&quot; : {
+                                &quot;audio&quot; : { &quot;encrypted&quot; : true, &quot;store_local&quot; : true, &quot;store_repo&quot; : true },
+                                &quot;video&quot; : { &quot;encrypted&quot; : false, &quot;store_local&quot; : true, &quot;store_repo&quot; : true },
+                                &quot;image&quot; : { &quot;encrypted&quot; : true, &quot;store_local&quot; : true, &quot;store_repo&quot; : true },
+                                &quot;text&quot; : { &quot;encrypted&quot; : true, &quot;store_local&quot; : true, &quot;store_repo&quot; : false }
+                            },
+                            &quot;media_encryption_selection&quot; : {
+                                &quot;audio&quot; : false,
+                                &quot;image&quot; : false,
+                                &quot;text&quot; : false
+                            },
+                            &quot;default_p2p_repo&quot; : &quot;LAN&quot;,
+                            &quot;accepted_repos&quot; : false,
+                            &quot;repos&quot; : {
+                                &quot;ipfs&quot;: {
+                                    &quot;dir&quot; : &quot;uploader-ipfs-repo&quot;,
+                                    &quot;swarm_tcp&quot; : 4024,
+                                    &quot;swarm_ws&quot; : 4025,
+                                    &quot;api_port&quot; : 5024,
+                                    &quot;tcp_gateway&quot; : 9292
+                                },
+                                &quot;LAN&quot; : {
+                                    &quot;base_dir&quot; : &quot;./test/dat_LAN_local&quot;,
+                                    &quot;local_only&quot; : true,
+                                    &quot;node_relay&quot; : {
+                                        &quot;address&quot; : &quot;localhost&quot;,
+                                        &quot;port&quot; : 1234
+                                    },
+                                    &quot;local_only&quot; : false,
+                                    &quot;ssh&quot; : {
+                                        &quot;address&quot; : &quot;192.168.1.33&quot;,
+                                    &quot;user&quot; : &quot;biff&quot;,
+                                    &quot;pass&quot; : &quot;trustm&quot;
+                                    }
+                                }
+                            }
+                    	},
+
+							&quot;counters&quot; : {
+								&quot;main&quot; : {}
+							},
+
+                       &quot;relayer&quot; : {
+                            &quot;files_only&quot; : false,
+                            &quot;output_dir&quot; : &quot;fail_over_persistence&quot;,
+                            &quot;output_file&quot; : &quot;/user_data.json&quot;,
+                            &quot;max_pending_messages&quot; : false,
+                            &quot;file_shunting&quot; : false,
+                            &quot;max_reconnect&quot; : 24,
+                            &quot;reconnect_wait&quot; : 5,
+                            &quot;attempt_reconnect&quot; : true,
+                            &quot;paths&quot; : [
+                                {
+                                    &quot;path&quot; : &quot;user&quot;,
+                                    &quot;port&quot; : 5114,
+                                    &quot;address&quot; : &quot;localhost&quot;,
+                                    &quot;tls&quot; : {
+                                        &quot;client_key&quot; : &quot;keys/cl_ec_key.pem&quot;,
+                                        &quot;client_cert&quot; : &quot;keys/cl_ec_crt.crt&quot;,
+                                        &quot;server_cert&quot; : &quot;keys/ec_crt.crt&quot;
+                                    }
+                                },
+                                {
+                                    &quot;path&quot; : &quot;persistence&quot;,
+                                    &quot;port&quot; : 5116,
+                                    &quot;address&quot; : &quot;localhost&quot;,
+                                    &quot;tls&quot; : {
+                                        &quot;client_key&quot; : &quot;keys/cl_ec_key.pem&quot;,
+                                        &quot;client_cert&quot; : &quot;keys/cl_ec_crt.crt&quot;,
+                                        &quot;server_cert&quot; : &quot;keys/ec_crt.crt&quot;
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        
+        &quot;mail&quot; : {
+            &quot;action&quot; : &quot;add-service&quot;,
+            &quot;target&quot; : &quot;module&quot;,
+            &quot;parameters&quot; : {
+                &quot;path&quot; : &quot;mail&quot;,
+                &quot;module&quot; : &quot;message-relay-services&quot;,
+                &quot;class_definition&quot; : &quot;MessageRelayer&quot;,
+                &quot;create&quot; : true
+                &quot;share&quot; : false,
+                &quot;conf&quot; : {
+                    &quot;address&quot; : &quot;192.168.1.81&quot;,
+                    &quot;port&quot;	: 5569,
+                    &quot;use_tls&quot; : false,
+                    &quot;tls&quot; : {
+                        &quot;preloaded&quot; : {
+                            &quot;client_key&quot; : false,
+                            &quot;server_cert&quot; : false
+                        },
+                        &quot;client_key&quot; : false,
+                        &quot;server_cert&quot; : false
+                    },
+                    &quot;default_tls&quot; : false,
+                    &quot;extended_tls_options&quot; : false,
+                    &quot;send_on_reconnect&quot; : false,
+                    &quot;attempt_reconnect&quot; : false,
+                    &quot;max_reconnect&quot; : 0,
+                    &quot;reconnect_wait&quot; 0
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<h3>copious transtion apps</h3>
+<p>In the following collection of configurations, the tool expects that a services will have launched an endpoint service for link management. The endpoint is an extension of the LinkManager class that comes with this module. In the examplse, the security options are off.</p>
+<p>Each module has a particular set of connections they set up with relationships to databases, persistence services, session management participation, and more. Other things may include particular connections to API services of downstream transaction processing.</p>
+<p>With the LinkManager in use, the copious-transition-apps startup with a default (and very basic) database. Once they are up, the tool may be used to connect them to better services.</p>
+<p><em><strong>copious-transitions</strong></em> extends the LinkManager class that help transition engines and database interfaces to make connections. The configuration files may contain field specific to the copious-transitions-apps.</p>
+<h4>1. captcha-igid : main web server framework</h4>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.81&quot;,
+        &quot;port&quot;	: 5551,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+	&quot;connections&quot; : {
+		&quot;session_db&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;shared-table-types&quot;,
+				&quot;class_definition&quot; : &quot;ChildProcDBComInterface&quot;,
+				&quot;db_type&quot; : &quot;session_key_value_db&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+					&quot;in_mem_table_connect&quot; : {
+						&quot;uds_path&quot; : &quot;./session_pipe-1&quot;,
+						&quot;uds_path_count&quot; : 0    
+					}
+				}
+			}
+    	},
+    	&quot;key_value_db&quot; : {},
+    	&quot;persistence_db&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;message-relay-service&quot;,
+				&quot;class_definition&quot; : &quot;MessageRelayer&quot;,
+				&quot;db_type&quot; : &quot;session_key_value_db&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+			        &quot;address&quot; : &quot;192.168.1.81&quot;,
+			        &quot;port&quot;	: 5571,
+			        &quot;use_tls&quot; : false,
+			        &quot;tls&quot; : {
+			            &quot;preloaded&quot; : {
+			                &quot;client_key&quot; : false,
+			                &quot;server_cert&quot; : false
+			            },
+			            &quot;client_key&quot; : false,
+			            &quot;server_cert&quot; : false
+			        },
+			        &quot;default_tls&quot; : false,
+			        &quot;extended_tls_options&quot; : false,
+			        &quot;send_on_reconnect&quot; : false,
+			        &quot;attempt_reconnect&quot; : false,
+			        &quot;max_reconnect&quot; : 0,
+			        &quot;reconnect_wait&quot; 0
+				}
+			}
+    	}
+    }
+}
+
+</code></pre>
+<h4>2. media-up-igid : session aware upload service (larger files)</h4>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.81&quot;,
+        &quot;port&quot;	: 5552,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+    &quot;connections&quot; : {
+		&quot;session_db&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;shared-table-types&quot;,
+				&quot;class_definition&quot; : &quot;ChildProcDBComInterface&quot;,
+				&quot;db_type&quot; : &quot;session_key_value_db&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+					&quot;in_mem_table_connect&quot; : {
+						&quot;uds_path&quot; : &quot;./session_pipe-2&quot;,
+						&quot;uds_path_count&quot; : 0
+					}
+				}
+			}
+    	},
+    	
+    	&quot;persistence_db&quot; : {},
+    	&quot;static_db&quot; : {},
+    	&quot;key_value_db&quot; : {},
+    	
+    	&quot;global_persistence&quot; : {
+    		&quot;action&quot; : &quot;add-service&quot;,
+    		&quot;target&quot; : &quot;module&quot;,
+    		&quot;parameters&quot; : {
+	    		&quot;target&quot; : &quot;transtion_engine&quot;,
+                &quot;module&quot; : &quot;global_persistence&quot;,
+                &quot;class_definition&quot; : &quot;CategoricalPersistenceManager&quot;,
+                &quot;create&quot; : true,
+                &quot;share&quot; : false,
+                &quot;conf&quot; : {
+                    &quot;cache_manager&quot; : false,
+                    //
+                    &quot;repo_bridge&quot; : {
+                        &quot;_wrapper_key&quot;: &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;,
+                        &quot;_wrapper_keys&quot; : {
+                            &quot;persistence&quot; : &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;,
+                            &quot;paid-persistence&quot; : &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;
+                        },
+
+                        &quot;media_handler&quot; : false, 
+        
+                        &quot;media_handler_conf&quot; : {
+                            &quot;media_dir&quot;: &quot;./test-output/pub_media/$media_type/&quot;,
+                            &quot;entries_dir&quot;: &quot;./test-output/data/$asset_type/&quot;,
+                            &quot;media_types&quot; : {
+                                &quot;audio&quot; : { &quot;encrypted&quot; : true, &quot;store_local&quot; : true, &quot;store_repo&quot; : true },
+                                &quot;video&quot; : { &quot;encrypted&quot; : false, &quot;store_local&quot; : true, &quot;store_repo&quot; : true },
+                                &quot;image&quot; : { &quot;encrypted&quot; : true, &quot;store_local&quot; : true, &quot;store_repo&quot; : true },
+                                &quot;text&quot; : { &quot;encrypted&quot; : true, &quot;store_local&quot; : true, &quot;store_repo&quot; : false }
+                            },
+                            &quot;media_encryption_selection&quot; : {
+                                &quot;audio&quot; : false,
+                                &quot;image&quot; : false,
+                                &quot;text&quot; : false
+                            },
+                            &quot;default_p2p_repo&quot; : &quot;LAN&quot;,
+                            &quot;accepted_repos&quot; : false,
+                            &quot;repos&quot; : {
+                                &quot;ipfs&quot;: {
+                                    &quot;dir&quot; : &quot;uploader-ipfs-repo&quot;,
+                                    &quot;swarm_tcp&quot; : 4024,
+                                    &quot;swarm_ws&quot; : 4025,
+                                    &quot;api_port&quot; : 5024,
+                                    &quot;tcp_gateway&quot; : 9292
+                                },
+                                &quot;LAN&quot; : {
+                                    &quot;base_dir&quot; : &quot;./test/dat_LAN_local&quot;,
+                                    &quot;local_only&quot; : true,
+                                    &quot;node_relay&quot; : {
+                                        &quot;address&quot; : &quot;localhost&quot;,
+                                        &quot;port&quot; : 1234
+                                    },
+                                    &quot;local_only&quot; : false,
+                                    &quot;ssh&quot; : {
+                                        &quot;address&quot; : &quot;192.168.1.33&quot;,
+                                    &quot;user&quot; : &quot;biff&quot;,
+                                    &quot;pass&quot; : &quot;trustm&quot;
+                                    }
+                                }
+                            }
+                    	},
+
+							&quot;counters&quot; : {
+								&quot;main&quot; : {}
+							},
+
+                       &quot;relayer&quot; : {
+                            &quot;files_only&quot; : false,
+                            &quot;output_dir&quot; : &quot;fail_over_persistence&quot;,
+                            &quot;output_file&quot; : &quot;/user_data.json&quot;,
+                            &quot;max_pending_messages&quot; : false,
+                            &quot;file_shunting&quot; : false,
+                            &quot;max_reconnect&quot; : 24,
+                            &quot;reconnect_wait&quot; : 5,
+                            &quot;attempt_reconnect&quot; : true,
+                            &quot;paths&quot; : [
+                                {
+                                    &quot;path&quot; : &quot;user&quot;,
+                                    &quot;port&quot; : 5114,
+                                    &quot;address&quot; : &quot;localhost&quot;,
+                                    &quot;tls&quot; : {
+                                        &quot;client_key&quot; : &quot;keys/cl_ec_key.pem&quot;,
+                                        &quot;client_cert&quot; : &quot;keys/cl_ec_crt.crt&quot;,
+                                        &quot;server_cert&quot; : &quot;keys/ec_crt.crt&quot;
+                                    }
+                                },
+                                {
+                                    &quot;path&quot; : &quot;persistence&quot;,
+                                    &quot;port&quot; : 5116,
+                                    &quot;address&quot; : &quot;localhost&quot;,
+                                    &quot;tls&quot; : {
+                                        &quot;client_key&quot; : &quot;keys/cl_ec_key.pem&quot;,
+                                        &quot;client_cert&quot; : &quot;keys/cl_ec_crt.crt&quot;,
+                                        &quot;server_cert&quot; : &quot;keys/ec_crt.crt&quot;
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }	    		
+    		}
+    	}
+	}
+}
+</code></pre>
+<h4>3. media-up-lite-igid : session aware upload service (small files)</h4>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.81&quot;,
+        &quot;port&quot;	: 5553,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+    &quot;connections&quot; : {
+		&quot;session_db&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;shared-table-types&quot;,
+				&quot;class_definition&quot; : &quot;ChildProcDBComInterface&quot;,
+				&quot;db_type&quot; : &quot;session_key_value_db&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+					&quot;in_mem_table_connect&quot; : {
+						&quot;uds_path&quot; : &quot;./session_pipe-3&quot;,
+						&quot;uds_path_count&quot; : 0
+					}
+				}
+			}
+    	},
+    	&quot;persistence_db&quot; : {},
+    	&quot;static_db&quot; : {},
+    	&quot;key_value_db&quot; : {},
+    	&quot;local_files&quot; : {},
+    	&quot;web_sockets&quot; : {}
+    }
+}
+</code></pre>
+<h4>4. publication-igid : session aware media publication management</h4>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.81&quot;,
+        &quot;port&quot;	: 5554,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+    &quot;connections&quot; : {
+		&quot;session_db&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;shared-table-types&quot;,
+				&quot;class_definition&quot; : &quot;ChildProcDBComInterface&quot;,
+				&quot;db_type&quot; : &quot;session_key_value_db&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+					&quot;in_mem_table_connect&quot; : {
+						&quot;uds_path&quot; : &quot;./session_pipe-4&quot;,
+						&quot;uds_path_count&quot; : 0
+					}
+				}
+			}
+    	},
+    	&quot;key_value_db&quot; : {},
+    	&quot;local_files&quot; : {},
+    	&quot;web_sockets&quot; : {}
+    }
+}
+</code></pre>
+<h4>5. song-search : crypto interface</h4>
+<p>TBD</p>
+<h4>6. counter-access-igid : follows</h4>
+<blockquote>
+<p><em><strong>access to contract managment and media usage tracking</strong></em></p>
+</blockquote>
+<h3>Endpoint Services</h3>
+<p>Endpoint services get introduced to counting services and searchers by offering subscription to their publication topics.</p>
+<p>Link management for the counters and searchers controlls their subscription behavior relative to the endpoints.</p>
+<h3>Counting Services</h3>
+<p>Counting services get introductions to streamers.</p>
+<h3>link-server-class application</h3>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.81&quot;,
+        &quot;port&quot;	: 5551,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+	&quot;connections&quot; : {
+    	&quot;publication_instance&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;message-relay-service&quot;,
+				&quot;class_definition&quot; : &quot;MultiPathRelayClient&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+			        &quot;address&quot; : &quot;192.168.1.81&quot;,
+			        &quot;port&quot;	: 5571,
+			        &quot;use_tls&quot; : false,
+			        &quot;tls&quot; : {
+			            &quot;preloaded&quot; : {
+			                &quot;client_key&quot; : false,
+			                &quot;server_cert&quot; : false
+			            },
+			            &quot;client_key&quot; : false,
+			            &quot;server_cert&quot; : false
+			        },
+			        &quot;default_tls&quot; : false,
+			        &quot;extended_tls_options&quot; : false,
+			        &quot;send_on_reconnect&quot; : false,
+			        &quot;attempt_reconnect&quot; : false,
+			        &quot;max_reconnect&quot; : 0,
+			        &quot;reconnect_wait&quot; 0
+				}
+			}
+    	},
+    	&quot;publisher&quot; : {
+			&quot;action&quot; : &quot;update-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;path&quot; : &quot;publisher&quot;,
+				&quot;module&quot; : &quot;message-relay-service&quot;,
+				&quot;class_definition&quot; : &quot;MultiPathRelayClient&quot;,
+				&quot;create&quot; : false,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+					&quot;subscription_link&quot; : &quot;192.168.1.81:5571&quot;,
+					&quot;tls&quot; : false
+				}
+			}
+    	},
+    	&quot;reload&quot; : {
+    		&quot;action&quot; : &quot;run-command&quot;,
+    		&quot;parameters&quot; : {
+    			&quot;target&quot; : &quot;data-server&quot;,
+    			&quot;command&quot; : &quot;reload&quot;
+    		}
+    	},
+    	&quot;backup-searches-halt&quot; : {
+    		&quot;action&quot; : &quot;run-command&quot;,
+    		&quot;parameters&quot; : {
+    			&quot;target&quot; : &quot;data-server&quot;,
+    			&quot;command&quot; : &quot;cycle&quot;,
+    			&quot;halt&quot; : true
+    		}
+    	},
+    	&quot;backup-searches&quot; : {
+    		&quot;action&quot; : &quot;run-command&quot;,
+    		&quot;parameters&quot; : {
+    			&quot;target&quot; : &quot;data-server&quot;,
+    			&quot;command&quot; : &quot;cycle&quot;,
+    			&quot;halt&quot; : false
+    		}
+    	}
+
+    }
+}
+
+</code></pre>
+<h3>streaming service</h3>
+<pre class="prettyprint source"><code>{
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;192.168.1.81&quot;,
+        &quot;port&quot;	: 5551,
+        &quot;use_tls&quot; : false,
+        &quot;tls&quot; : {
+            &quot;preloaded&quot; : {
+                &quot;client_key&quot; : false,
+                &quot;server_cert&quot; : false
+            },
+            &quot;client_key&quot; : false,
+            &quot;server_cert&quot; : false
+        },
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+        &quot;send_on_reconnect&quot; : false,
+        &quot;attempt_reconnect&quot; : false,
+        &quot;max_reconnect&quot; : 0,
+        &quot;reconnect_wait&quot; 0
+    },
+
+	&quot;connections&quot; : {
+    	&quot;publication_instance&quot; : {
+			&quot;action&quot; : &quot;add-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;target&quot; : &quot;database&quot;,
+				&quot;module&quot; : &quot;message-relay-service&quot;,
+				&quot;class_definition&quot; : &quot;MultiPathRelayClient&quot;,
+				&quot;create&quot; : true,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+			        &quot;address&quot; : &quot;192.168.1.81&quot;,
+			        &quot;port&quot;	: 5571,
+			        &quot;use_tls&quot; : false,
+			        &quot;tls&quot; : {
+			            &quot;preloaded&quot; : {
+			                &quot;client_key&quot; : false,
+			                &quot;server_cert&quot; : false
+			            },
+			            &quot;client_key&quot; : false,
+			            &quot;server_cert&quot; : false
+			        },
+			        &quot;default_tls&quot; : false,
+			        &quot;extended_tls_options&quot; : false,
+			        &quot;send_on_reconnect&quot; : false,
+			        &quot;attempt_reconnect&quot; : false,
+			        &quot;max_reconnect&quot; : 0,
+			        &quot;reconnect_wait&quot; : 0
+				}
+			}
+    	},
+    	&quot;publisher&quot; : {
+			&quot;action&quot; : &quot;update-service&quot;,
+ 			&quot;target&quot; : &quot;module&quot;,
+			&quot;parameters&quot; : {
+				&quot;path&quot; : &quot;publisher&quot;,
+				&quot;module&quot; : &quot;message-relay-service&quot;,
+				&quot;class_definition&quot; : &quot;MultiPathRelayClient&quot;,
+				&quot;create&quot; : false,
+				&quot;share&quot; : false,
+				&quot;conf&quot; : {
+					&quot;subscription_link&quot; : &quot;192.168.1.81:5571&quot;,
+					&quot;tls&quot; : false
+				}
+			}
+    	}
+
+    }
+}
+
+</code></pre></article>
+    </section>
+
+
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Thu Jul 16 2026 23:04:21 GMT-0700 (Pacific Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

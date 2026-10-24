@@ -1,33 +1,34 @@
 {
-  "name": "com_link_manager",
-  "version": "0.2.2",
-  "description": " A class that helps orchestrate an application's communication links.",
-  "bin": {
-    "com_link_manager" : "./bin/index.js"
-  },
-  "main": "index.js",
-  "scripts": {
-    "test": "node ./tests/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/copious-world/com_link_manager.git"
-  },
-  "keywords": [
-    "communication",
-    "orchestration"
-  ],
-  "author": "R. Leddy",
-  "license": "MIT",
-  "funding": {
-    "type": "GitHub Sponsors",
-    "url": "https://github.com/sponsors/copious-world"
-  },
-  "bugs": {
-    "url": "https://github.com/copious-world/com_link_manager/issues"
-  },
-  "homepage": "https://github.com/copious-world/com_link_manager#readme",
-  "dependencies": {
-    "message-relay-services": "^0.9.29"
-  }
+    "name": "com_link_manager",
+    "version": "0.2.2",
+    "description": " A class that helps orchestrate an application's communication links.",
+    "bin": {
+        "com_link_manager": "./bin/index.js"
+    },
+    "main": "index.js",
+    "scripts": {
+        "test": "node ./tests/index.js",
+        "gen-docs": "jsdoc --configure ./tools/jsdoc.conf -a all -R README.md --verbose"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/copious-world/com_link_manager.git"
+    },
+    "keywords": [
+        "communication",
+        "orchestration"
+    ],
+    "author": "R. Leddy",
+    "license": "MIT",
+    "funding": {
+        "type": "GitHub Sponsors",
+        "url": "https://github.com/sponsors/copious-world"
+    },
+    "bugs": {
+        "url": "https://github.com/copious-world/com_link_manager/issues"
+    },
+    "homepage": "https://github.com/copious-world/com_link_manager#readme",
+    "dependencies": {
+        "message-relay-services": "^0.9.29"
+    }
 }
